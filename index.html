@@ -5,15 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KurirPro - Multi Dropship Auto OSRM</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { overflow-x: hidden; }
+    </style>
 </head>
 <body class="bg-slate-100 min-h-screen font-sans">
 
-    <div class="max-w-xl mx-auto p-4">
+    <div class="max-w-xl mx-auto p-2 sm:p-4">
 
         <!-- HEADER DENGAN LOGO -->
         <header class="bg-slate-900 text-white p-4 rounded-t-xl flex justify-between items-center shadow border-b-2 border-yellow-500">
             <div class="flex items-center gap-3">
-                <img src="logo.png" alt="Logo KurirPro" class="w-12 h-12 rounded-full border-2 border-yellow-500 object-cover shadow">
+                <img src="logo.png" alt="Logo KurirPro" class="w-12 h-12 rounded-full border-2 border-yellow-500 object-cover shadow" onerror="this.src='https://via.placeholder.com/48?text=KP'">
                 <div>
                     <h1 class="text-xl font-bold tracking-wide text-yellow-400">KurirPro</h1>
                     <p class="text-[10px] text-gray-300 tracking-widest uppercase">FAST & SAFELY</p>
@@ -25,7 +28,7 @@
             </div>
         </header>
 
-        <div class="bg-white p-6 rounded-b-xl shadow-md">
+        <div class="bg-white p-5 rounded-b-xl shadow-md">
 
             <!-- 1. FORM REGISTER -->
             <div id="registerBox" class="space-y-4">
@@ -43,7 +46,7 @@
                         <label class="block text-xs font-semibold text-gray-600 mb-1">Password</label>
                         <input type="password" id="regPass" required class="w-full border p-2 rounded text-sm focus:outline-yellow-500">
                     </div>
-                    <button type="submit" class="w-full bg-slate-900 text-yellow-400 font-bold py-2 rounded text-sm hover:bg-slate-800 transition">Daftar Akun</button>
+                    <button type="submit" class="w-full bg-slate-900 text-yellow-400 font-bold py-2.5 rounded text-sm hover:bg-slate-800 transition shadow">Daftar Akun</button>
                 </form>
                 <p class="text-center text-xs text-gray-500">Sudah punya akun? <a href="#" onclick="switchTab('login')" class="text-yellow-600 font-semibold underline">Login</a></p>
             </div>
@@ -60,12 +63,12 @@
                         <label class="block text-xs font-semibold text-gray-600 mb-1">Password</label>
                         <input type="password" id="loginPass" required class="w-full border p-2 rounded text-sm focus:outline-yellow-500">
                     </div>
-                    <button type="submit" class="w-full bg-slate-900 text-yellow-400 font-bold py-2 rounded text-sm hover:bg-slate-800 transition">Masuk</button>
+                    <button type="submit" class="w-full bg-slate-900 text-yellow-400 font-bold py-2.5 rounded text-sm hover:bg-slate-800 transition shadow">Masuk</button>
                 </form>
                 <p class="text-center text-xs text-gray-500">Belum punya akun? <a href="#" onclick="switchTab('register')" class="text-yellow-600 font-semibold underline">Daftar Baru</a></p>
             </div>
 
-            <!-- 3. FORM ORDER MULTI-DROPSHIP DENGAN OSRM AUTOMATIC ROUTING -->
+            <!-- 3. FORM ORDER MULTI-DROPSHIP -->
             <div id="orderBox" class="hidden space-y-5">
                 <div class="border-b pb-2 flex justify-between items-center">
                     <div>
@@ -94,7 +97,7 @@
                             <label class="block text-xs font-medium mb-0.5">Alamat Penjemputan (Sebutkan Jalan & Kota)</label>
                             <div class="flex gap-2">
                                 <textarea id="orderPengirimAlamat" rows="2" required placeholder="Contoh: Jl. Transyogi No. 12, Cileungsi, Bogor" class="w-full border p-1.5 rounded text-sm"></textarea>
-                                <button type="button" onclick="hitungSemuaRuteOSRM()" class="bg-slate-800 text-yellow-400 text-xs px-3 py-1 rounded font-bold hover:bg-slate-900 transition">Set Jemput</button>
+                                <button type="button" onclick="hitungSemuaRuteOSRM()" class="bg-slate-800 text-yellow-400 text-xs px-3 py-1 rounded font-bold hover:bg-slate-900 transition shrink-0">Set Jemput</button>
                             </div>
                             <input type="hidden" id="pengirimLat">
                             <input type="hidden" id="pengirimLon">
@@ -311,7 +314,6 @@
             }
         }
 
-        // INTEGRASI OPENSTREETMAP (NOMINATIM GEOCODING)
         async function geocodeAddress(alamat) {
             if (!alamat || alamat.trim().length < 5) return null;
             try {
@@ -327,7 +329,6 @@
             return null;
         }
 
-        // INTEGRASI OPENSTREETMAP (OSRM ROUTING API)
         async function getOSRMRoute(lat1, lon1, lat2, lon2) {
             try {
                 const url = `https://router.project-osrm.org/route/v1/driving/${lon1},${lat1};${lon2},${lat2}?overview=false`;
@@ -335,7 +336,7 @@
                 const data = await res.json();
                 if (data.code === 'Ok' && data.routes && data.routes.length > 0) {
                     const meter = data.routes[0].distance;
-                    return (meter / 1000).toFixed(1); // Konversi ke KM (1 desimal)
+                    return (meter / 1000).toFixed(1);
                 }
             } catch (err) {
                 console.error("OSRM Error:", err);
@@ -343,7 +344,6 @@
             return null;
         }
 
-        // PROSES HITUNG SATU RUAS TUJUAN
         async function hitungRuteSatuTujuan(idIndex) {
             const card = document.getElementById(`penerima_card_${idIndex}`);
             if (!card) return;
@@ -358,9 +358,8 @@
                 return;
             }
 
-            statusEl.innerText = "🔍 Mencari rute jalan jalan raya via OpenStreetMap...";
+            statusEl.innerText = "🔍 Mencari rute jalan raya via OpenStreetMap...";
 
-            // Geocode Pengirim jika belum ada
             let pLat = document.getElementById("pengirimLat").value;
             let pLon = document.getElementById("pengirimLon").value;
 
@@ -369,58 +368,3 @@
                 if (pLoc) {
                     pLat = pLoc.lat;
                     pLon = pLoc.lon;
-                    document.getElementById("pengirimLat").value = pLat;
-                    document.getElementById("pengirimLon").value = pLon;
-                    document.getElementById("pengirimStatus").innerText = "✅ Lokasi penjemputan ditemukan!";
-                } else {
-                    statusEl.innerText = "❌ Alamat pengirim tidak ditemukan di peta. Perjelas nama jalan & kota.";
-                    return;
-                }
-            }
-
-            // Geocode Penerima
-            const tLoc = await geocodeAddress(penerimaAlamat);
-            if (!tLoc) {
-                statusEl.innerText = "❌ Alamat penerima tidak ditemukan di peta. Perjelas nama jalan & kota.";
-                return;
-            }
-
-            // Hitung Rute OSRM
-            const km = await getOSRMRoute(pLat, pLon, tLoc.lat, tLoc.lon);
-            if (km) {
-                jarakInput.value = km;
-                statusEl.innerText = `✅ Rute ditemukan! Jarak: ${km} KM`;
-                hitungSubtotalOngkir(card, parseFloat(km));
-            } else {
-                statusEl.innerText = "❌ Gagal menghitung rute darat.";
-            }
-        }
-
-        // PROSES CEK / RECALCULATE SEMUA TUJUAN
-        async function hitungSemuaRuteOSRM() {
-            const items = document.querySelectorAll('.penerima-item');
-            for (let item of items) {
-                const idIndex = item.id.replace('penerima_card_', '');
-                await hitungRuteSatuTujuan(idIndex);
-            }
-        }
-
-        // RUMUS ONGKIR KURIRPRO: ((jarak - 3) * 3000) + 15000
-        function hitungSubtotalOngkir(card, jarak) {
-            let subtotal = 15000;
-            if (jarak > 3) {
-                subtotal = 15000 + ((jarak - 3) * 3000);
-            }
-            card.querySelector('.penerima-ongkir-text').innerText = "Rp " + subtotal.toLocaleString("id-ID");
-            hitungTotalKeseluruhan();
-        }
-
-        function hitungTotalKeseluruhan() {
-            const items = document.querySelectorAll('.penerima-item');
-            let grandTotal = 0;
-
-            items.forEach(item => {
-                const jarak = parseFloat(item.querySelector('.penerima-jarak').value) || 0;
-                let subtotal = 15000;
-                if (jarak > 3) {
-                    sub
